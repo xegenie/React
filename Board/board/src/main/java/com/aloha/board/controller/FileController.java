@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -183,5 +184,31 @@ public class FileController {
 
     }
     
+    @GetMapping("/{pTable}/{pNo}")
+    public  ResponseEntity<?> getMethodName(
+        @PathVariable("pTable") String pTable,
+        @PathVariable("pNo") Long pNo,
+        @RequestParam(value = "type", required = false) String type
+        ) {
+            try {
+                Files file = new Files();
+                file.setPTable(pTable);
+                file.setPNo(pNo);
+                file.setType(type);
+                if( type == null ) {
+                    List<Files> list = fileService.listByType(file);
+                    return new ResponseEntity<>(list, HttpStatus.OK);
+                }
+                if( type.equals("MAIN")) {
+                    Files mainFile = fileService.selectByType(file);
+                    return new ResponseEntity<>(mainFile, HttpStatus.OK);
+                } else {
+                    List<Files> list = fileService.listByType(file);
+                    return new ResponseEntity<>(list, HttpStatus.OK);
+                }
+            } catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+    }
     
 }

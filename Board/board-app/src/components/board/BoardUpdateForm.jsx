@@ -6,7 +6,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DownloadIcon from '@mui/icons-material/Download';
 import Checkbox from '@mui/material/Checkbox';
 
-const BoardUpdateForm = ({board, onUpdate, onDelete, fileList, onDownload, onDeleteFile, deleteCheckedFiles}) => {
+const BoardUpdateForm = ({board, onUpdate, onDelete, fileList, onDownload, 
+                        onDeleteFile, deleteCheckedFiles, mFile}) => {
 
   const {id} = useParams();
   const [title, setTitle] = useState('')
@@ -56,7 +57,7 @@ const BoardUpdateForm = ({board, onUpdate, onDelete, fileList, onDownload, onDel
       'Content-Type': 'multipart/form-data'
     }
 
-    onUpdate(formData)               // multipart/form-data
+    onUpdate(formData, headers)               // multipart/form-data
     // onUpdate(id, title, writer, content) // application/json
   }
   
@@ -134,12 +135,20 @@ const BoardUpdateForm = ({board, onUpdate, onDelete, fileList, onDownload, onDel
           <textarea cols={40} rows={10} value={content} className={styles['form-input']} onChange={changeContent}></textarea>
         </td>
       </tr>
-      <tr>
-        <td>대표 파일</td>
-        <td>
-          <input type="file" onChange={changeMainFile} className={styles['form-input']} />
-        </td>
-      </tr>
+      {
+        !mFile ? (
+          <tr>
+            <td>대표 파일</td>
+            <td>
+              <input
+                type="file"
+                onChange={changeMainFile}
+                className={styles['form-input']}
+              />
+            </td>
+          </tr>
+        ) : null
+      }
       <tr>
         <td>첨부 파일</td>
         <td>
@@ -152,9 +161,12 @@ const BoardUpdateForm = ({board, onUpdate, onDelete, fileList, onDownload, onDel
             fileList.map((file) => (
               <div className='flex-box' key={file.id}>
                 <div className="item">
-                  {/* <input type="checkbox" name='check' onClick={ () => checkFileId(file.id)} /> */}
                   <Checkbox onChange={ () => checkFileId(file.id)} />
+                <div className="item-img">
+                  { file.type == 'MAIN' && <span className='badge'>대표</span> }
+                  {/* <input type="checkbox" name='check' onClick={ () => checkFileId(file.id)} /> */}
                   <img src={`/api/files/img/${file.id}`} className='file-img' alt={file.originName}/>
+                </div>
                   <span>{file.originName} ({format.byteToUnit(file.fileSize)})</span>
                 </div>
                 <div className="item">

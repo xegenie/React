@@ -47,56 +47,80 @@ public class BoardServiceImpl implements BoardService {
         return boardMapper.selectById(id);
     }
 
+    
+    public int uploadFile(Boards entity) {
+        int result = 0;
+
+         // 파일 업로드
+         String pTable = "boards";
+         Long pNo = entity.getNo();
+ 
+         List<Files> uploadFileList = new ArrayList<>();
+ 
+         MultipartFile mainFile = entity.getMainFile();
+         if( mainFile != null && !mainFile.isEmpty() ) {
+             Files mainFileInfo = new Files();
+             mainFileInfo.setPTable(pTable);
+             mainFileInfo.setPNo(pNo);
+             mainFileInfo.setData(mainFile);
+             mainFileInfo.setType("MAIN");
+             uploadFileList.add(mainFileInfo);
+         }
+ 
+         List<MultipartFile> files = entity.getFiles();
+         if ( files != null && !files.isEmpty() ) {
+             for (MultipartFile multipartFile : files) {
+                 if ( multipartFile.isEmpty() )
+                 continue;
+                 Files fileInfo = new Files();
+                 fileInfo.setPTable(pTable);
+                 fileInfo.setPNo(pNo);
+                 fileInfo.setData(multipartFile);
+                 fileInfo.setType("SUB");
+                 uploadFileList.add(fileInfo);
+             }
+         }
+         try {
+             result += fileService.upload(uploadFileList);
+         } catch (Exception e) {
+             log.error("게시글 파일 업로드 중 에러 발생");
+             e.printStackTrace();
+         }
+         return result;
+    }
+
     @Override
     // insert가 안되면 파일 업로드도 안됨
     @Transactional
     public boolean insert(Boards entity) {
+
         int result = boardMapper.insert(entity);
-        String pTable = "boards";
-        Long pNo = entity.getNo();
+       result += uploadFile(entity);
 
-        List<Files> uploadFileList = new ArrayList<>();
-
-        MultipartFile mainFile = entity.getMainFile();
-        if( mainFile != null && !mainFile.isEmpty() ) {
-            Files mainFileInfo = new Files();
-            mainFileInfo.setPTable(pTable);
-            mainFileInfo.setPNo(pNo);
-            mainFileInfo.setData(mainFile);
-            mainFileInfo.setType("MAIN");
-            uploadFileList.add(mainFileInfo);
-        }
-
-        List<MultipartFile> files = entity.getFiles();
-        if ( files != null && !files.isEmpty() ) {
-            for (MultipartFile multipartFile : files) {
-                if ( multipartFile.isEmpty() )
-                continue;
-                Files fileInfo = new Files();
-                fileInfo.setPTable(pTable);
-                fileInfo.setPNo(pNo);
-                fileInfo.setData(multipartFile);
-                fileInfo.setType("SUB");
-                uploadFileList.add(fileInfo);
-            }
-        }
-        try {
-            result += fileService.upload(uploadFileList);
-        } catch (Exception e) {
-            log.error("게시글 파일 업로드 중 에러 발생");
-            e.printStackTrace();
-        }
         return result > 0;
     }
 
     @Override
     public boolean update(Boards entity) {
-        return boardMapper.update(entity) > 0;
+
+        int result = boardMapper.update(entity);
+        result += uploadFile(entity);
+
+        return result > 0;
     }
 
     @Override
     public boolean updateById(Boards entity) {
-        return boardMapper.updateById(entity) > 0;
+
+        // 게시글 조회
+        Boards oldBoard = boardMapper.selectById(entity.getId());
+        entity.setNo(oldBoard.getNo());
+        // 게시글 수정
+        int result = boardMapper.updateById(entity);
+        // 파일 업로드
+        result += uploadFile(entity);
+
+        return result > 0;
     }
 
     @Override

@@ -11,6 +11,7 @@ const UpdateContainer = () => {
   // state
   const [board, setBoard] = useState({})
   const [fileList, setFileList] = useState([])
+  const [mainFile, setMainFile] = useState()
 
   // 게시글 데이터 요청
   const getBoard = async () => {
@@ -19,6 +20,9 @@ const UpdateContainer = () => {
     
     setBoard(data.board)
     setFileList(data.fileList)
+
+    const no = await data.board.no
+    getMainFile(no)
   }
 
   // 게시글 수정 요청 이벤트 핸들러
@@ -84,6 +88,8 @@ const UpdateContainer = () => {
       const data = boardResponse.data
       const fileList = data.fileList
       setFileList(fileList)
+
+      getMainFile(board.no)
     } catch (error) {
       console.log(error);
       
@@ -104,10 +110,21 @@ const UpdateContainer = () => {
       const data = boardResponse.data
       const fileList = data.fileList
       setFileList(fileList)
+
+      getMainFile(board.no)
+
     } catch (error) {
       console.log(error);
     }
   }
+
+  // 메인 파일 조회
+  const getMainFile = async (no) => {
+    const response = await files.fileByType("boards", no, "MAIN")
+    const file = await response.data
+    setMainFile(file)
+  }
+  
 
   useEffect( () => {
     getBoard()
@@ -123,7 +140,8 @@ const UpdateContainer = () => {
                      fileList={fileList}
                      onDownload={onDownload}
                      onDeleteFile={onDeleteFile}
-                     deleteCheckedFiles={deleteCheckedFiles}/>
+                     deleteCheckedFiles={deleteCheckedFiles}
+                     mFile={mainFile}/>
     </>
   )
 }

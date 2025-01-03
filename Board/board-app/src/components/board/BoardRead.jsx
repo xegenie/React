@@ -3,13 +3,21 @@ import { Link, useParams } from 'react-router-dom'
 import styles from './css/BoardRead.module.css'
 import * as format from '../../utils/format'
 
-const BoardRead = ({board, fileList, onDownload}) => {
+const BoardRead = ({board, fileList, onDownload, mainFile}) => {
 
   const {id} = useParams();
 
   return (
     <div className="container">
     <h1 className="title">게시글 조회</h1>
+
+    {/* 메인 이미지 */}
+    <div>
+      {
+        mainFile && <img src={`/api/files/img/${mainFile?.id}`} className='file-img' alt={mainFile?.originName}/>
+      }
+    </div>
+
     <table className={styles.table}>
       <tbody>
         <tr>
@@ -45,7 +53,10 @@ const BoardRead = ({board, fileList, onDownload}) => {
               fileList.map((file) => (
                 <div className='flex-box' key={file.id}>
                   <div className="item">
-                    <img src={`/api/files/img/${file.id}`} className='file-img' alt={file.originName}/>
+                    <div className="item-img">
+                      { file.type == 'MAIN' && <span className='badge'>대표</span> }
+                      <img src={`/api/files/img/${file.id}`} className='file-img' alt={file.originName}/>
+                    </div>
                     <span>{file.originName} ({format.byteToUnit(file.fileSize)})</span>
                   </div>
                   <div className="item">
