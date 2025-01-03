@@ -130,7 +130,7 @@
     <!-- 부모 테이블 기준 삭제 -->
     <delete id="deleteByParent">
         DELETE FROM files
-        WHEREp_table = #{pTable}
+        WHERE p_table = #{pTable}
           AND p_no = #{pNo}
     </delete>
 

@@ -115,8 +115,21 @@ public class BoardController {
     }
 }
 
-  @PutMapping()
-  public ResponseEntity<?> update(@RequestBody Boards boards) {
+  @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<?> updateBoardForm(Boards boards) {
+      try {
+        boolean result = boardService.updateById(boards);
+        if ( result ) {
+            return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("FAIL", HttpStatus.OK);
+        }
+      } catch (Exception e) {
+          return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+  }
+  @PutMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> updateBoard(@RequestBody Boards boards) {
       try {
         boolean result = boardService.updateById(boards);
         if ( result ) {
