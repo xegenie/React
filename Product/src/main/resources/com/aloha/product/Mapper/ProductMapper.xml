@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aloha.product.Mapper.ProductMapper">
+
+  <!-- 전체 상품 목록 조회 -->
+  <select id="list">
+    SELECT * 
+    FROM products
+  </select>
+
+  <!-- 상품 단건 조회 -->
+  <select id="select">
+    SELECT * 
+    FROM products
+    WHERE no = #{no}
+  </select>
+  <!-- 상품 단건 조회 -->
+  <select id="selectById">
+    SELECT * 
+    FROM products
+    WHERE id = #{id}
+  </select>
+
+  <!-- 상품 추가 -->
+  <insert id="insert">
+    INSERT INTO products (id, title, content, img)
+    VALUES (#{id}, #{title}, #{content}, #{img})
+  </insert>
+
+  <!-- 상품 업데이트 -->
+  <update id="update">
+    UPDATE products
+      <set>
+        <if test="title != null">
+          title = #{title}, 
+        </if>
+        <if test="content != null">
+          content = #{content}, 
+        </if>
+        <if test="img != null">
+          img = #{img}
+        </if>
+      </set>
+    WHERE id = #{id}
+  </update>
+  <update id="updateById">
+    UPDATE products
+      <set>
+        <if test="title != null">
+          title = #{title}, 
+        </if>
+        <if test="content != null">
+          content = #{content}, 
+        </if>
+        <if test="img != null">
+          img = #{img}
+        </if>
+      </set>
+    WHERE no = #{no}
+  </update>
+
+  <!-- 상품 삭제 -->
+  <delete id="delete">
+    DELETE FROM products 
+    WHERE no = #{no}
+  </delete>
+  <delete id="deleteById">
+    DELETE FROM products 
+    WHERE id = #{id}
+  </delete>
+
+</mapper>
